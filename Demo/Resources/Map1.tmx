@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="100" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="3">
+ <tileset firstgid="1" source="mapdongian.tsx"/>
+ <layer id="1" name="Ground" width="100" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt0bEJwEAQBLG3+y/asStYwY/g8mHvnCRJkiRJkiRJkiTJwrsOyE//sPQPS/+w9A+L9A+pZUXaQGpZkTaQWlakDaSWFWkDqWVF2kBqWZE2kFpWpA2klhVpA6llRdpAalmRNpBaVqQNpJYVaQOpZUXaQGpZkTaQWlakDaSWFWkDqWVF2kBqWZE2kFpWpA2klhVpA6llRdpAalmRNpBaVqQNpJYVaQOpZeXB7nYfsmYAkw==
+  </data>
+ </layer>
+ <objectgroup id="2" name="Objects">
+  <object id="1" name="player" type="player" x="147" y="967">
+   <properties>
+    <property name="Kind" value="Player1"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
