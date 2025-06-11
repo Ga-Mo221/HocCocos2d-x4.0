@@ -393,6 +393,12 @@ void PlayerController::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event
             jump();
         }
         break;
+
+	case EventKeyboard::KeyCode::KEY_SHIFT:
+        if (_isGrounded) {
+			_isShiftPressed = true; // Đánh dấu shift được nhấn
+			dash();
+        }
     }
 }
 
@@ -415,6 +421,9 @@ void PlayerController::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* even
     case EventKeyboard::KeyCode::KEY_UP_ARROW:
         _isJumpPressed = false;
         break;
+
+	case EventKeyboard::KeyCode::KEY_SHIFT:
+		_isShiftPressed = false;
     }
 }
 
@@ -477,6 +486,30 @@ void PlayerController::jump()
 
         CCLOG("Player jumped!");
     }
+}
+
+void PlayerController::dash() {
+	if (!_player || !_player->getPhysicsBody()) return;
+	// Chỉ dash khi đang trên mặt đất hoặc wall cling
+	if (_isGrounded)
+	{
+		auto body = _player->getPhysicsBody();
+		Vec2 velocity = body->getVelocity();
+		if (_isLeftPressed) {
+			velocity.x = -SPEED_DASH;
+			_currentState = PlayerState::DashingLeft;
+		}
+		else if (_isRightPressed) {
+			velocity.x = SPEED_DASH;
+			_currentState = PlayerState::DashingRight;
+		}
+		else if (!_isLeftPressed && !_isRightPressed){
+            velocity.x = SPEED_DASH;
+            _currentState = PlayerState::DashingRight;
+		}
+		body->setVelocity(velocity);
+		CCLOG("Player dashed!");
+	}
 }
 
 

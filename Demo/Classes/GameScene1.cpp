@@ -1,5 +1,6 @@
 ﻿#include "GameScene1.h"
-#include "PlayerController.h"
+#include "controller.h"
+#include "LoadAnimation.h"
 
 USING_NS_CC;
 
@@ -164,50 +165,64 @@ Vec2 GameScene1::getSpawnPosition(TMXTiledMap* map)
 
 bool GameScene1::createPlayer()
 {
-    // Get spawn position from tile map
     Vec2 spawnPos = getSpawnPosition(_tileMap);
 
-    // Create player visual (triangle)
-    auto character = DrawNode::create();
+    // Tạo player sprite với kiểm tra chặt chẽ
+    auto player = LoadAnimation::createSpriteWithFrame(
+        "Idel.plist", "Idel.png", "IdelRight1.png",
+        0.5f, Vec2(0.5f, 0.5f));
+
+    if (!player)
+    {
+        CCLOG("❌ CRITICAL: Failed to create player sprite - files missing!");
+        // Tạo sprite backup đơn giản
+        player = Sprite::create();
+        if (!player) {
+            CCLOG("❌ Even basic sprite creation failed!");
+            return false;
+        }
+    }
+
+    // Tạo physics body...
     Vec2 trianglePoints[] = {
-        Vec2(0, 25),      // Top
-        Vec2(-12, -12),   // Bottom left
-        Vec2(12, -12)     // Bottom right
+		Vec2(-60, 25), Vec2(40, 25), Vec2(40, -90), Vec2(-60, -90)
     };
 
-    // Create physics body with proper material
-    auto body = PhysicsBody::createPolygon(trianglePoints, 3,
-        PhysicsMaterial(0.1f, 0.0f, 0.7f)); // density, restitution, friction
-    body->setDynamic(true);
-    // Prevent rotation
-    body->setRotationEnable(false);
-    body->setCategoryBitmask(0x03);      // Player category
-    body->setCollisionBitmask(0xFFFFFFFF); // Collide with everything
-    body->setContactTestBitmask(0xFFFFFFFF); // Generate contact events
+    auto body = PhysicsBody::createPolygon(trianglePoints, 4,
+        PhysicsMaterial(0.1f, 0.0f, 0.7f));
 
-    // Set mass for consistent physics
-    body->setMass(1.0f);
-
-
-    character->setPhysicsBody(body);
-    character->drawSolidPoly(trianglePoints, 3, Color4F::BLUE);
-    character->setPosition(spawnPos);
-
-    this->addChild(character);
-    _player = character;
-
-    CCLOG("Player created at position: (%f, %f)", spawnPos.x, spawnPos.y);
-
-    // Create and attach player controller
-    auto controller = PlayerController::createController();
-    if (!controller)
-    {
-        CCLOG("Failed to create player controller");
+    if (!body) {
+        CCLOG("❌ Failed to create physics body");
         return false;
     }
 
-    controller->setPlayer(_player);
-    this->addChild(controller);
+    body->setDynamic(true);
+    body->setRotationEnable(false);
+    body->setCategoryBitmask(0x03);
+    body->setCollisionBitmask(0xFFFFFFFF);
+    body->setContactTestBitmask(0xFFFFFFFF);
+    body->setMass(1.0f);
+
+    player->setPhysicsBody(body);
+    player->setPosition(spawnPos);
+
+    // ✅ Kiểm tra trước khi add
+    if (player) {
+        this->addChild(player);
+        _player = player;
+        CCLOG("✅ Player created successfully");
+    }
+
+    // Tạo controller với kiểm tra
+    auto controller = Controllers::createController();
+    if (controller) {
+        controller->setPlayer(_player);
+        this->addChild(controller);
+        CCLOG("✅ Controller created successfully");
+    }
+    else {
+        CCLOG("⚠️ Controller creation failed - continuing without controller");
+    }
 
     return true;
 }
